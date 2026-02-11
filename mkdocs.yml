@@ -1,0 +1,118 @@
+site_name: Bakbakuum
+site_url: https://bakbakuum.github.io
+repo_url: https://github.com/hafiz-bs23/bakbakuum
+repo_name: Bakbakuum
+theme:
+  name: material
+  font:
+    text: Libre Baskerville
+    code: Fira Code
+  language: en
+  favicon: assets/favicon.png
+  logo: assets/logo.png
+  icon:
+    repo: fontawesome/brands/git-alt
+
+  palette:
+    # Dark mode
+    - scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Dark mode
+      primary: yellow
+      accent: deep orange
+    # Light mode
+    - scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Light mode
+      primary: pink
+      accent: deep purple
+  features:
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.sections
+    - navigation.path
+    - toc.follow
+    - navigation.top
+    - navigation.footer
+    - search.highlight
+    - search.share
+    - search.suggest
+    - content.footnote.tooltips
+    - content.tooltips
+    - content.code.copy
+    - content.code.select
+    - content.code.annotate
+    
+markdown_extensions:
+  - abbr # For abbreviations
+  - admonition # For admonitions
+  - attr_list # For Annotations
+  - md_in_html # For Annotations
+  - tables
+  - footnotes
+  - def_list
+  - pymdownx.details # For admonitions
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite # For codeblock
+  - pymdownx.snippets # For codeblock
+  - pymdownx.critic
+  - pymdownx.smartsymbols
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.blocks.caption
+  - pymdownx.tabbed: # For content tab
+      alternate_style: true
+  - pymdownx.superfences: # For admonitions, annotations, codeblock
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight: # For codeblock
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji # Use twemoji for emojis
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg # Use to_svg for emojis
+  - pymdownx.magiclink
+  - toc:
+      permalink: true
+      toc_depth: 4
+
+plugins:
+  - blog:
+      blog_dir: blog
+      blog_toc: true
+      post_url_format: "{file}"
+      post_excerpt_separator: <!-- more -->
+      authors: true
+      authors_file: ".authors.yml"
+  - search
+  - tags
+  - offline
+  - meta:
+      meta_file: "{blog}/meta.md"
+
+
+extra:
+  status:
+    new: Recently added
+
+extra_css:
+  - stylesheets/extras.css
+
+extra_javascript:
+  - javascripts/extras.js
