@@ -25,11 +25,11 @@
     color: var(--md-primary-fg-color);
 }
 
-.md-typeset li a{
+.md-typeset li a {
     color: var(--md-primary-fg-color);
 }
 
-.md-typeset .md-tag{
+.md-typeset .md-tag {
     border: 1px solid var(--md-primary-fg-color);
 }
 
@@ -41,14 +41,20 @@
     border-color: var(--md-accent-fg-color);
 }
 
-.md-nav{
+.md-nav {
     color: #03cea4
 }
 
-.md-typeset .icon_primary{
+.md-typeset .icon_primary {
     color: var(--md-primary-fg-color);
 }
 
 [dir=ltr] .md-typeset blockquote {
     border-left: .2rem solid var(--md-primary-fg-color);
+}
+
+pre code {
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
+    /* Ensures long words also break */
 }

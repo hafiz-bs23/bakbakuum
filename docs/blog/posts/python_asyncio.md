@@ -13,7 +13,7 @@ authors:
   - hafiz
 readtime: 12
 slug: python_asyncio
-draft: true
+draft: false
 ---
 
 Master asynchronous programming in Python! Understand cores, threads, concurrency, and how asyncio revolutionizes I/O operations. 🚀⚡

@@ -1,0 +1,27 @@
+services:
+  # Development Environment (Live-reload)
+  # Access at http://localhost:8008
+  dev:
+    container_name: bakbakuum-dev
+    build:
+      context: .
+      target: development
+    ports:
+      - "8008:8000"
+    volumes:
+      - .:/app
+    environment:
+      - WATCHDOG_USE_POLLING=true # Helps with live-reload on Windows
+    stdin_open: true
+    tty: true
+
+  # Production Environment (Nginx)
+  # Access at http://localhost:8080
+  prod:
+    container_name: bakbakuum-prod
+    build:
+      context: .
+      target: production
+    ports:
+      - "8080:80"
+    restart: always
