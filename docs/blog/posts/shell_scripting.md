@@ -2,45 +2,64 @@
 title: Power Tool - Shell Scripting 
 date:
     created: 2026-04-29
-    updated: 2025-04-29
+    updated: 2026-05-04
 categories: [Development]
 tags:
     - Scripting
     - DevOps
 authors:
-  - hafiz
+    - hafiz
 readtime: 10
 slug: power_tool_shell_scripting
 draft: false
 ---
-Shell Scripting Skill is a nice addition to your power tool. It's power that most of the Dev don't have and must to have if you like automation.
+
+![Shell scripting — terminal and automation](../post_assets/shell_scripting_cover.png){ width="100%" loading=lazy }
+
+Shell Scripting Skill is a nice addition to your power tool 💪. It's power that most of the Dev don't have and must have if you like automation ⚡🤖 — glue for CI, servers, and daily chores.
 <!-- more -->
-## Introduction
-!!! note "What is shell?"
-    A program - that interprets the command you type in your terminal and passes them on to the operating system. i.e. bash - "Bourne Again Shell" | feature-rich, fast, very common
+## 🐚 Introduction
 
-!!! note "What is a script?"
-    A file containing commands for the shell. | Allows automation
+!!! note "🖥️ What is shell?"
+    A program that interprets the commands you type in your terminal and passes them to the operating system — e.g. **bash** (“Bourne Again Shell”): feature-rich, fast, very common.
 
-### Structure of Bash Script
+!!! note "📄 What is a script?"
+    A file containing commands for the shell — allows automation.
 
-Starts with a `shebang` line. Then comes the actual command and then exit code. The exit code can be anything `0-255`. 
-- `#` at the start of the line is comment.
-- Five pieces of information make your script more professional.
-  - `Author`
-  - `Date Creation`
-  - `Last Modified`
-  - `Description`
-  - `Usage`
-- File Permission | There will be three group and three operations
-  - Owner | Creator of the file | 
-  - Group | Files group |
-  - Public | Every User | 
-    `r` for read, `w` for write, `x` for execute and `-` represent nonperishable. The sequence goes like `OOOGGGPPP`. For example `rwxrw-r--` represent Owner have all the permissions, group have read and write permission, and the public have the read permission only. The first char `d` says it's a directory and `-` says it's a file. `chmod` is used for modifying permission.
-- To run script anywhere from  the machine, we need to add it in system `PATH` - a variable where the OS looks for the scripts. We need to add the script folder to the `PATH` 
+### 📜 Structure of a Bash script
 
-```shell
-#!/bin/bash
+Every script tells a small story: **shebang** → **commands** → **exit status** (conventionally `0` = success; any value `0`–`255` is allowed).
+
+---
+
+!!! tip "Skeleton checklist"
+    - 💬 **`#`** — starts a line **comment** (documentation for humans).
+    - 📋 **Five header fields** many teams expect in production scripts:
+        - `Author`
+        - `Date creation`
+        - `Last modified`
+        - `Description`
+        - `Usage`
+    - 🔐 **Permissions** — *who* can do *what* (`chmod` / `umask`).
+
+---
+
+#### 🔐 Permissions in one breath
+
+| Audience | Meaning |
+| :-- | :-- |
+| **Owner** 👤 | User who owns the file |
+| **Group** 👥 | Users in the file’s group |
+| **Others** 🌍 | Everyone else on the system |
+
+Letters **`r`** (read), **`w`** (write), **`x`** (execute), **`-`** (that bit **not** granted). Example string **`rwxrw-r--`**: owner *rwx*, group *rw-*, others *r--*. The leading **`d`** means **directory**; **`-`** means regular file. Change mode with **`chmod`**.
+
+#### 🧭 Run from anywhere
+
+Add the folder that holds your script to **`PATH`** (directories the OS searches for executables) if you want to call it without `./`.
+
+```bash title="script101.sh" linenums="1" hl_lines="1 18"
+#!/bin/bash # (1)!
 
 # Author: Hafizur Rahman
 # Date Created: 2024-06-01
@@ -53,34 +72,37 @@ Starts with a `shebang` line. Then comes the actual command and then exit code. 
 # To run this script, use the following command:
 # bash script101.sh
 
-# This a single line comment
+# This is a single line comment
 echo "The script is a go."
-exit 0
+exit 0 # (2)!
 ```
 
-## Bash Syntax
+1.  :material-shield-star: **Shebang** — tells the kernel which interpreter runs the file (`#!/bin/bash`).
+2.  :material-check-decagram-outline: **`exit 0`** — ends the script with status **0** (success); other codes signal failure to callers / CI.
 
-`Paramater` - is any entity that store values. Three type of parameters in bash are:
+## 🧱 Bash Syntax
 
-- Variables | Values can manually be changed
-- Positional parameters |
-- Special parameters | 
+**Parameter** — any entity that stores values. Three kinds of parameters in bash:
 
-### Variables
+- 📦 **Variables** — values you can change manually
+- 🔢 **Positional parameters** — `$1`, `$2`, …
+- ⭐ **Special parameters** — `$#`, `$?`, `$@`, …
+
+### 📦 Variables
 
 !!! note "Variables"
-    Store reusable data under convenient names
+    Store reusable data under convenient names ✨
 
-- `name="value"` | No spaces before and after `=`. This is **User defined** variable and all lowercase.
+- `name="value"` — no spaces before or after `=`. This is a **user-defined** variable and is usually lowercase.
 - **Shell variables**
-  - Bourne Shell Variables | 10 | `PATH`, `HOME` - Current Users home directory, `USER` - Current user user name, `HOSTNAME` - Current username, `HOSTTYPE` - The architecture of the current computer, `PS1` - Prompt structure | They have all Uppercase names
-  - Bash Shell Variables | 95+
+  - Bourne shell variables (~10): `PATH`, `HOME` (current user’s home), `USER` (username), `HOSTNAME`, `HOSTTYPE` (machine architecture), `PS1` (prompt) — typically **uppercase** names.
+  - Bash-specific variables — 95+ more.
 
-```bash
+```bash title="variables_demo.sh" linenums="1" hl_lines="3 7"
 student_name="Hafizur Rahman"
 echo "$student_name"
-echo "Hello ${student_name}, welcome to the bash scripting course."
-echo "You all Upper case name is: ${student_name^^} and only first letter lower case is: ${student_name,}"
+echo "Hello ${student_name}, welcome to the bash scripting course." # (1)!
+echo "You all Upper case name is: ${student_name^^} and only first letter lower case is: ${student_name,}" # (2)!
 echo "The length of the student name is: ${#student_name}"
 echo "First three characters of the student name is: ${student_name:0:3}"
 
@@ -92,9 +114,12 @@ echo "The hostname is: $HOSTNAME"
 echo "The computer architecture is: $HOSTTYPE"
 ```
 
-#### output
+1.  :material-variable: **Double-quoted expansion** — `"$student_name"` and `"${student_name}"` preserve spaces and allow parameter expansion inside the string.
+2.  :material-format-letter-case-upper: **Case modifiers** — `${var^^}` uppercases all letters; `${var,}` lowercases only the first character (bash 4+).
 
-```bash
+#### Sample output
+
+```text title="Sample output — variables"
 Hafizur Rahman
 Hello Hafizur Rahman, welcome to the bash scripting course.
 You all Upper case name is: HAFIZUR RAHMAN and only first letter lower case is: hafizur Rahman
@@ -107,112 +132,120 @@ The hostname is: ZTDKW39GPQ3MK
 The computer architecture is: aarch64
 ```
 
-### Shell Expansions
+### 🌀 Shell expansions
 
 !!! note "Expansions"
-    Retrieve data, process command output and perform calculations
+    Retrieve data, process command output, and perform calculations 🔧
 
-### Parameter Expansion
+### 📎 Parameter expansion
 
-Access - `${var_name}` reference the parameter. | This is called parameter expansion.
+Access with `${var_name}` — this is **parameter expansion** (the workhorse of bash).
 
-#### Some Tricks
+#### ✨ Some tricks
 
-- Case: `${var,}` First lowercase | `${var,,}` All lower | `${var^}` Capetalize | `${var^^}` All Upper
-- Length: `${#var}` | Number of character
-- Slicing: `${var:offset:length}` | Slicing a variable. Negative offset also possible but it will need additional `space` i.e. ` -3:2`
+- Case: `${var,}` first lowercase | `${var,,}` all lower | `${var^}` capitalize first | `${var^^}` all upper
+- Length: `${#var}` — number of characters
+- Slicing: `${var:offset:length}` — a substring. A negative offset needs a **space** before it, e.g. `${var: -3:2}`
 
-```bash
+```bash title="parameter_expansion_playground.sh"
+# Add examples for ${var}, ${#var}, and slicing here (see “Some tricks” above).
+```
+
+#### Sample output
+
+```text title="Sample output — parameter expansion"
 
 ```
 
-#### output
+### 🔄 Command substitution
 
-```bash
+Similar to expansion, but you run a **command** and substitute its output.
+Syntax: `$(command)` (or legacy `` `command` `` — prefer `$()` for nesting 📌)
 
-```
-
-### Command Substitution
-
-Similler to expansion, but here we use the command. We will look for the value that came-out after the `command` execution.
-Syntax - `$(command)`
-
-```bash
-# Command Substitution
-time_now=$(date +"%Y-%m-%d %H:%M:%S")
+```bash title="command_substitution_demo.sh" linenums="1" hl_lines="2"
+# Command substitution
+time_now=$(date +"%Y-%m-%d %H:%M:%S") # (1)!
 echo "The current date and time is: $time_now"
 ```
 
-#### output
+1.  :material-swap-horizontal: **`$(...)`** runs the inner command and replaces this whole token with its stdout (trimmed trailing newlines).
 
-```bash
+#### Sample output
+
+```text title="Sample output — command substitution"
 The current date and time is: 2026-04-30 00:12:03
 ```
 
-### Aerithmentic Expansion
+### 🔢 Arithmetic expansion
 
-Syntax - `$((expression))` | Symbols `+`, `-`, `*`, `/`, `%`
-But limited only with whole number. There is a workaround. we need to use `bc` command and `scale` variable to work with and set the decimal places. `bc` -> Bacis calculator | a programming language for aerithmetic operation.
-Syntax - `scale=<number_of_decimal_value>` `expression` | `bc`
-Example - `echo "scale=10 5/2 | bc`
+Syntax: `$((expression))` — operators `+`, `-`, `*`, `/`, `%`.
+Limited to integers in `$((...))`. For decimals, use **`bc`** and set **`scale`**. **bc** is a basic calculator — a small language for arithmetic.
+Typical pattern: pipe an expression into `bc`, e.g. `echo "scale=10; 5/2" | bc`.
 
-```bash
-# Arithmetic Expansion whole number
+```bash title="arithmetic_demo.sh" linenums="1" hl_lines="4 15"
+# Arithmetic expansion — whole numbers
 num1=10
 num2=20
-echo "Sum $((num1 + num2)), Difference $((num1 - num2)), Product $((num1 * num2)), Quotient $((num2 / num1)), Remainder $((num2 % num1))"
+echo "Sum $((num1 + num2)), Difference $((num1 - num2)), Product $((num1 * num2)), Quotient $((num2 / num1)), Remainder $((num2 % num1))" # (1)!
 
-#Aerithmetic Expansion floating point number
+# Arithmetic with floating point via bc
 num3=10.5
 num4=20.5
-echo "Sum $(echo "$num3 + $num4" | bc), Difference $(echo "$num3 - $num4" | bc), Product $(echo "$num3 * $num4" | bc), Division  $(echo "scale=2; $num4 / $num3" | bc), Quotient $(echo "$num4 / $num3" | bc)"
+echo "Sum $(echo "$num3 + $num4" | bc), Difference $(echo "$num3 - $num4" | bc), Product $(echo "$num3 * $num4" | bc), Division $(echo "scale=2; $num4 / $num3" | bc), Quotient $(echo "$num4 / $num3" | bc)" # (2)!
 ```
 
-#### output
+1.  :material-calculator: **Integer arithmetic** — `$((...))` is fast and needs no subprocess; division truncates toward zero.
+2.  :material-decimal: **`bc`** does fractional math; **`scale=`** sets decimal places for division.
 
-```bash
+#### Sample output
+
+```text title="Sample output — arithmetic"
 Sum 30, Difference -10, Product 200, Quotient 2, Remainder 0
-Sum 31.0, Difference -10.0, Product 215.2, Division  1.95, Quotient 1
+Sum 31.0, Difference -10.0, Product 215.2, Division 1.95, Quotient 1
 ```
 
-### Tilda Expansion
+### 🏠 Tilde expansion
 
-`~` | Shows the home directory
-`~username` | Shows the `username`'s home directory
+`~` — your home directory 🗝️  
+`~username` — that user’s home directory
 
-```bash
+```bash title="tilde_expansion_demo.sh" linenums="1" hl_lines="2"
 echo "The home directory is: ~ or $HOME"
-echo "The current directory is $PWD or ~+"
+echo "The current directory is $PWD or ~+" # (1)!
 echo "The previous directory is $OLDPWD or ~-"
 ```
 
-#### output
+1.  :material-map-marker: **`~+`** expands to **`$PWD`** (current dir); **`~-`** is previous (`$OLDPWD`).
 
-```bash
+#### Sample output
+
+```text title="Sample output — tilde"
 The home directory is: ~ or <home_directory>
 The current directory is <current_directory> or ~+
 The previous directory is <previous_directory> or ~-
 ```
 
-### Brace Expansion
+### 🎲 Brace expansion
 
-String List | Syntax - `{}`
-Range List | Syntax - `<prefix>{start..end..gap}`
+**String list** — syntax `{a,b,c}`  
+**Range list** — syntax `<prefix>{start..end..step}`
 
-```bash
-# Brace Expansion
+```bash title="brace_expansion_demo.sh" linenums="1" hl_lines="9"
+# Brace expansion
 echo {a,19,z,barry,42}
 echo {jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec}
 echo {0..9}
 echo {a..z}
 echo {100..1..5}
 echo roll{01..10}
-echo month{01..5}/day{01..3}.txt
+echo month{01..5}/day{01..3}.txt # (1)!
 ```
 
-#### output
+1.  :material-file-tree: **Nested brace pairs** generate a **Cartesian product** of path components — great for dummy file names in tests.
 
-```bash
+#### Sample output
+
+```text title="Sample output — brace expansion"
 a 19 z barry 42
 jan feb mar apr may jun jul aug sep oct nov dec
 0 1 2 3 4 5 6 7 8 9
@@ -222,68 +255,67 @@ roll01 roll02 roll03 roll04 roll05 roll06 roll07 roll08 roll09 roll10
 month01/day01.txt month01/day02.txt month01/day03.txt month02/day01.txt month02/day02.txt month02/day03.txt month03/day01.txt month03/day02.txt month03/day03.txt month04/day01.txt month04/day02.txt month04/day03.txt month05/day01.txt month05/day02.txt month05/day03.txt
 ```
 
-## How Bash Process Command Lines
+## ⚙️ How Bash processes command lines
 
-Takes the Script | Read Line by Line | Do 5 Step Process => Execution
+Takes the script → read line by line → five-step pipeline → execution. 🎢
 
-**Step-1** | **Tokenization:** Token - characters that is considered as a single unit.
-Metacheracters (`| & ; () <> space tab newline`)
-Word - Token without unquoted metacharacter
-Operator - Token with unquoted metacharacter
+1️⃣ **Tokenization:** a **token** is a chunk the shell treats as one unit.
+**Metacharacters** (`| & ; () <> space tab newline`).  
+**Word** — token with no unquoted metacharacter.  
+**Operator** — token with an unquoted metacharacter.
 
-- Control Operators (`Newline | || & && ; ;; ;& ;;& |& ( )`)
-- Redirection Operators (`< > << >> <& >| <<- <> >&`)
-  
-Operator only matter when they are *unquoted*.
+- Control operators (`newline || & && ; ;; ;& ;;& |& ( )`)
+- Redirection operators (`< > << >> <& >| <<- <> >&`)
 
-**Step-2** | **Command Identification:**
-Simple Command | words terminated by control operator | `<command_name> <command_argument>` | `echo 12345` | 
-Compound Command | Programming constructs: conditional, loop. | `<reserve_word> ..` |
+Operators matter only when they are *unquoted*.
 
-**Step-3** | **Expansions:**
+2️⃣ **Command identification:**  
+**Simple command** — words until a control operator: `<command_name> <arguments>` (e.g. `echo 12345`).  
+**Compound command** — `if`, loops, etc.; starts with a **reserved word**.
 
-- Stage 1 | Brace Expansion
-- Stage 2 |
-  - Parameter Expansion
-  - Arithmetic Expansion
-  - Command Substitution
-  - Tilda Expansion
-- Stage 3 | Word Splitting | Process to split the result of some **unquoted** expansions (Parameter expansion, Command Substitution, Arithmetic expansions) into separate words | Split by `IFS` *Internal Field Seperator* (`space tab newline`) variable | `numbers="1 2 3";touch $numbers` will create 3 files `1`, `2`, `3` | `numbers="1,2,3";touch $numbers` will create only one file `1,2,3` | We can set `IFS` like `IFS=","`
-- Stage 4 | Globbing | Only performed on words | Patterns contains `*`, `?`, `[]` unquoted | Example `file*.txt`, `file??.txt`, `file[abc][1-3].txt` | Search file only in the current directory
+3️⃣ **Expansions:**
 
-!!! info "Remember"
-    If you want the output of a parameter expansion, arithmetic expansion, command substitution to be considered as a single world, **wrap the expansion in double quotes**.
+- Stage 1 — brace expansion 🎲
+- Stage 2 — parameter expansion, arithmetic expansion, command substitution, **tilde** expansion 🪄
+- Stage 3 — **word splitting** — splits results of **unquoted** expansions into words using **`IFS`** (*internal field separator*: space, tab, newline by default). Example: `numbers="1 2 3"; touch $numbers` creates three files `1`, `2`, `3`. With `numbers="1,2,3"; touch $numbers` you still get one argument unless you set `IFS=","` ✂️
+- Stage 4 — **globbing** — only on words; patterns use `*`, `?`, `[]` unquoted (e.g. `file*.txt`, `file??.txt`, `file[abc][1-3].txt`). Matches live in the current directory unless the path says otherwise. 🎯
 
-!!! info Remember
-    Stages run in sequence and expansion in same stage have same priority and performed as the order they found from left to right.
+!!! info "💬 Quote expansions"
+    If you want the result of parameter expansion, arithmetic expansion, or command substitution to stay **one word**, wrap it in **double quotes**.
 
-**Step-4** | **Quote Removal:** Remove all unquoted backslashes, single quote cheracters and double quote cheracters that did **not** result from a shell expansion.
+!!! info "⏱️ Expansion order"
+    Stages run in order; within the same stage, expansions share priority and run **left to right**.
 
-**Step-5** | **Redirection:** Stream `0` Standard Input Stream => Provides alternative way to provide input, Stream `1` Standard Output Stream => data produced after successful command execution, Stream `2` Standard Error stream => Error messages and Status | `<` input | `cat < hello.txt` | `>`output, `2>` error output | `cd /root 2> error.txt` | `&>` Standard output and error | `>>` is used for append
+4️⃣ **Quote removal:** strip unquoted backslashes and quote characters that did **not** come from an expansion.
 
-### How Quoting works
+5️⃣ **Redirection:** **0** stdin 📥, **1** stdout 📤, **2** stderr. `<` input, `>` stdout, `2>` stderr, `&>` both streams, `>>` append.
 
-Quoting ia bout Removing Special Meaning
+### 🙊 How quoting works
 
-- `\` | Remove meanig from next character
-- `''` | Remove meaning from all charater inside
-- `""` | Remove meaning from all except `$` sign and ``\`
+Quoting is about **removing special meaning** from characters 🧷
 
-```bash
+- `\` — cancels special meaning for the **next** character
+- `'...'` — everything inside is literal
+- `"..."` — `$`, backticks, `\`, and `!` (history) can still act special
+
+```bash title="quoting_demo.sh" linenums="1" hl_lines="2 6"
 # Quoting
-echo jon & snow
+echo jon & snow # (1)!
 echo jon\& snow
 echo path C:\User\user_name\images
 echo path 'C:\User\user_name\images'
-echo path 'C:\User\$USER\images'
+echo path 'C:\User\$USER\images' # (2)!
 echo path "C:\User\\$USER\images"
 ```
 
-#### Output
+1.  :material-flash-alert: **`&` runs the next command in the background** — unquoted `echo jon & snow` backgrounds `echo jon` and tries to run `snow`.
+2.  :material-code-tags: **Single quotes are literal** — `\` and `$` are **not** special inside `'...'`, so `$USER` stays text.
 
-```bash
+#### Sample output
+
+```text title="Sample output — quoting"
 jon
-./commands_anotomy: line 4: snow: command not found
+./commands_anatomy: line 4: snow: command not found
 jon& snow
 path C:Useruser_nameimages
 path C:\User\user_name\images
@@ -291,74 +323,80 @@ path C:\User\$USER\images
 path C:\User\<user_name>\images
 ```
 
-## Requesting User Input
+## ⌨️ Requesting user input
 
-### Positional parameter
+### 🔢 Positional parameters
 
-Shell the the positional parameters and assign a number.`<script_name> positional_param_1 positional_param_2 ...`
+The shell assigns **positional parameters** `$1`, `$2`, …  
+`<script_name> arg1 arg2 ...`
 
-```bash
+```bash title="taking_user_input.sh" linenums="1" hl_lines="6"
 echo "You are: $1"
 echo "Your home directory is: $2"
 echo "Your fav color is: $3"
-# Let's make a calculator
-echo $(( ${2:-0} $1 ${3:-0} )) # :-0 means if nothing is passed, use 0 as default value. The syntax is ${parameter:-word} where parameter is the variable and word is the default value if parameter is unset or null.
+# Mini calculator: operator in $1, operands in $2 and $3
+echo $(( ${2:-0} $1 ${3:-0} )) # (1)! ${parameter:-word} — default if unset/null
 ```
 
-Executing the script: `./taking_user_input Hafiz $HOME Yello`
+1.  :material-source-branch: **`${name:-default}`** supplies **default** when `name` is unset or empty — handy for optional math operands.
 
-Output
+Executing: `./taking_user_input Hafiz $HOME Yello`
 
-```bash
+#### Sample output
+
+```text title="Sample output — positional parameters"
 You are: Hafiz
 Your home directory is: <home_directory>
 Your fav color is: Yello
 ```
 
-### Special Parameters
+### ⭐ Special parameters
 
-> Parameters that Bash gives special meaning. Value of a special parameter is calculated for us based on our current script.
+> Bash gives **special parameters** fixed meanings; their values depend on how the shell or script was invoked.
 
-`$#` gives the number of positional provided.
-`$0` give error message, name of the script is provided by this parameter.
-`$*` As same as `$@` when unquoted, but when quoted `"$1" "$2" "$3" .. "$N"` but it uses the `IFS` and we can change the IFS if we need.
-`$@` Access all the positional parameter and seperate them with `space` | `$1 $2 $3 .. $N`. But if we use `"$@"` you get `"$1" "$2" "$3" .. "$N"`.
+`$#` — number of positional parameters.  
+`$0` — name (path) of the shell or script.  
+`$*` — same as `$@` when unquoted; when quoted, still one word per original argument but joined using the **first character of `IFS`**.  
+`$@` — all positional parameters; `"$@"` is `"$1" "$2" …` preserving separate arguments.
 
-!!! note "Remember"
-    `“$@”` is the same as `$@`, except that `“$@”` stops word splitting from happening on the positional parameters
+!!! note "Prefer \"$@\" for passing arguments ➡️"
+    `"$@"` expands to separate quoted arguments — use it when you forward args to another command.
 
-```bash
-# Special parameter
+```bash title="special_parameters_demo.sh" linenums="1" hl_lines="5 7"
+# Special parameters
 echo "You have provided $# arguments"
 echo "We are currently running the script: $0"
-IFS=","
+IFS="," # (1)!
 echo "All the arguments you have provided are: $@"
-echo "We can also access the arguments: $*"
+echo "We can also access the arguments: $*" # (2)!
 ```
 
-Executing the script: `./taking_user_input Hafiz $HOME Blue`
+1.  :material-format-list-bulleted: **`IFS`** changes how **`$*`** (and `"$*"`) **join** fields when you glue arguments into one string.
+2.  :material-information-outline: **`echo "$*"`** with `IFS=,` shows commas between args; **`"$@"`** would still quote each arg separately (`"a" "b"`).
 
-Output
+Executing: `./taking_user_input Hafiz $HOME Blue`
 
-```bash
+#### Sample output
+
+```text title="Sample output — special parameters"
 You have provided 3 arguments
 We are currently running the script: ./taking_user_input
 All the arguments you have provided are: Hafiz <home_directory> Blue
 We can also access the arguments: Hafiz,<home_directory>,Blue
 ```
 
-### Read Command
+### 📥 Read command
 
-`read` command wait for user input. We can also store them inside variable. We can also use `-p` option to prompt the user some messages before the input. `-t` is a timeout option also we can add. `-s` make the input secret. `-n` specifies the number of characters.
+`read` **waits** for input and can store fields in variables ⌛. Common flags: **`-p`** prompt, **`-t`** timeout, **`-s`** silent (passwords) 🔒, **`-n`** read N characters.
 
-```bash
+```bash title="read_demo.sh" linenums="1" hl_lines="16"
 # User input with read
 echo "Enter your name, surname and age: "
 read user_name user_age
 echo "Your name is: $user_name"
 echo "Your age is: $user_age"
 
-# Prompting user input with a message
+# Prompt
 read -p "Enter your village: " village
 echo "You are from: $village"
 read -t 5 -p "Memory teaser: What is the capital of France? " capital
@@ -367,47 +405,53 @@ if [ -z "$capital" ]; then
 else
     echo "Your answer is: $capital"
 fi
-read -s -p "Tell me a secret: " secret
+read -s -p "Tell me a secret: " secret # (1)!
 echo -e "\nYour secret is: $secret"
 read -n 5 -p "Enter a 5-character code: " code
 echo -e "\nYour code is: $code"
 ```
 
-### Select Command
+1.  :material-eye-off-outline: **`-s`** (silent) — hides what you type (password prompts); pair with `echo` for a newline after input.
 
-> `select` gives the menu of options to select from. Syntax `PS3=<prompt>select <ver_name> in <spaced options>; do <commands> done`. If `<var_name>` is not given the selected item will be stored in `response`. Looping behavior is by default, we can use `^C` or a `break` command before `done`. `PS3` control the prompt for select.
+### 📋 Select command
 
-```bash
+> **`select`** prints a menu. Pattern: set **`PS3`**, then `select var in words; do ...; done`. Without a variable name, the choice goes to **`REPLY`**. Break or **Ctrl+C** to exit. **`PS3`** is the menu prompt.
+
+```bash title="select_demo.sh" linenums="1" hl_lines="6"
 # Select command
 PS3="Please select a day of the week: "
 select today in "Monday" "Tuesday" "Wednesday" "Thursday" "Friday"; do
     echo "You have selected: $today"
-    break
+    break # (1)!
 done
 ```
 
-## Logic
+1.  :material-stop-circle-outline: **`break`** exits the **`select`** loop (otherwise it repeats the menu forever).
 
-### Chaining Commands
+## 🔗 Logic
 
-- `&` | Sends the `before` command to background and continue the `after` command | Syntax `before & after` | Only care about the current job | Helps to run command asynchronously
-- `;` | Runs the command in sequence | Syntax `before ; after` | Only care about the current Job
-- `&&` |  Only run the `after` command if the `before` command is successful.
-- `||`| Only run the `after` command if the `before` command is unsuccessful.
+### 🔗 Chaining commands
 
-```bash
-# Chaining Commands
+- **`&`** — run the left command in the **background** ⏩, continue with the right: `cmd1 & cmd2`
+- **`;`** — run in sequence: `cmd1 ; cmd2`
+- **`&&`** — run the right command only if the left **succeeded** (exit 0) ✅
+- **`||`** — run the right command only if the left **failed** ❌
+
+```bash title="chaining_demo.sh" linenums="1" hl_lines="5"
+# Chaining commands
 echo 123 & echo 546
 echo "before" ; echo "after"
 ls unknown_directory ; echo "This will run"
-ls unknown_another_directory && echo "This will not run"
+ls unknown_another_directory && echo "This will not run" # (1)!
 ls unknown_yet_another_directory || echo "This will run because the previous command failed"
-echo "This is successful" || ls unknown_directory # Second command will not run because the first command is successful
+echo "This is successful" || ls unknown_directory
 ```
 
-#### Output
+1.  :material-transit-connection-variant: **`&&`** short-circuits — the right side runs **only** if the left command returns **0**.
 
-```bash
+#### Sample output
+
+```text title="Sample output — chaining"
 546
 before
 after
@@ -420,28 +464,27 @@ This will run because the previous command failed
 This is successful
 ```
 
-### Test commands
+### 🧪 Test command
 
-> Command to compare different piece of information. Test will return an exit status `0` for success and `1`for failure. Written in between `[  ]`, make sure to include `space`. i.e. `[ 2 -eq 3 ]; echo $?`
+> Compare values or file metadata. **`[` ... `]`** returns **0** (true) or **1** (false). **Spaces** inside `[` `]` are required. Example: `[ 2 -eq 3 ]; echo $?`
 
-- Numeric: We have `-eq`, `-ne`, `-gt`, `-lt`, `-geq`, `-leq`
-- String: We have `=`, `!=`, `-z`|To check if empty, `-n`|Opposite of -z
-- File: We have `-e`|If file exist, `-f`|If a regular file, `-d`|If a. directory, `-x`|If executable permission, `-r`, `-w`
+- Numeric tests: `-eq`, `-ne`, `-gt`, `-lt`, **`-ge`**, **`-le`**
+- String tests: `=`, `!=`, `-z` (empty), `-n` (non-empty)
+- File tests: `-e` exists, `-f` regular file, `-d` directory, `-x` executable, `-r`, `-w`
 
-```bash
-# Test Command
-# Numeric
+```bash title="test_demo.sh" linenums="1" hl_lines="7 12"
+# Test command — numeric
 echo "Testing numeric conditions"
 [ 5 -eq 5 ]; echo $?
 [ 5 -ne 5 ]; echo $?
 [ 5 -gt 3 ]; echo $?
 [ 5 -lt 3 ]; echo $?
-[ 5 -ge 5 ]; echo $?
+[ 5 -ge 5 ]; echo $? # (1)!
 [ 5 -le 3 ]; echo $?
 
 # String
 echo "Testing string conditions"
-[ "hello" = "hello" ]; echo $?
+[ "hello" = "hello" ]; echo $? # (2)!
 [ "hello" != "world" ]; echo $?
 [ -z "" ]; echo $?
 [ -n "not empty" ]; echo $?
@@ -458,9 +501,12 @@ touch file1
 rm file1
 ```
 
-#### Output
+1.  :material-numeric: **`-ge` / `-le`** — “greater-or-equal” / “less-or-equal” for integer comparisons in `[ ]`.
+2.  :material-format-quote-close: **String tests** — `=` / `!=` compare lexicographically; **quote** variables (`"$v"`) so empty values don’t break `[ ]` syntax.
 
-```bash
+#### Sample output
+
+```text title="Sample output — test"
 Testing numeric conditions
 0
 1
@@ -482,35 +528,35 @@ Testing file conditions
 0
 ```
 
-### If Statement
+### 🔀 If statement
 
-Syntax - `if <test_command>; then <consequent_commands> elif <test_command>; then <consequent_commands> else <alternate_command>fi` | If the command exists with 0, will run | It's a better practice to write `consequent_commands` and `alternate_command` with a tab. `elif`, `else` is optional | Nested `if` statement is also possible. `&&` and `||` are used for combining conditions and represent `AND` and `OR` operation.
+Syntax: `if test; then ... elif test; then ... else ... fi`. Exit status **0** runs the `then` branch. Indent the bodies. **`&&` / `||`** combine tests (AND / OR).
 
-```bash
-# If Statement
+```bash title="if_demo.sh" linenums="1" hl_lines="8"
+# If statement
 if [ 5 -gt 3 ]; then
     echo "5 is greater than 3"
 fi
 
 if [ 5 -gt 3 ]; then
     echo "5 is greater than 3"
-elif [ 5 -eq 3 ]; then
+elif [ 5 -eq 3 ]; then # (1)!
     echo "5 is equal to 3"
 else
     echo "5 is not greater than 3"
 fi
 
-# Nasted If Statements
+# Nested if statements
 car="Toyota"
 car_type="sedan"
-if [ $car_type = "shorts" ]; then
-    if [ $car = "Lamborghini" ]; then
+if [ "$car_type" = "shorts" ]; then
+    if [ "$car" = "Lamborghini" ]; then
         echo "You are the most lucky person"
     else
         echo "You are the more lucky person"
     fi
-elif [ $car_type = "sedan" ]; then
-    if [ $car = "Toyota" ]; then
+elif [ "$car_type" = "sedan" ]; then
+    if [ "$car" = "Toyota" ]; then
         echo "You are the lucky person"
     else
         echo "At least you have a car"
@@ -519,7 +565,7 @@ else
     echo "You are me"
 fi
 
-# Combining Conditions, And and Or
+# Combining conditions — AND / OR
 age=25
 if [ $age -gt 18 ] && [ $age -lt 30 ]; then
     echo "You are a young adult"
@@ -530,12 +576,14 @@ if [ $age -lt 18 ] || [ $age -gt 30 ]; then
 fi
 ```
 
-### Case Statement
+1.  :material-source-branch: **`elif`** chains extra tests without nesting another full `if` — first matching branch wins.
 
-Syntax - `case "$<variable_name>" in <blobing_pattern_1>) <command_lines|caluse><another_caluse>;; <blobing_pattern_2> <clause>;; ... *) <default_command>;; esac` | Logical check only on a single variable | `$` and `""` is important and remember to use it always | Will take the first match | If we have same output for different cases we can follow the `A|B command;;` pattern.
+### 🎛️ Case statement
 
-```bash
-# Case Statement
+Syntax: `case "$var" in pattern) commands;; *) default;; esac` — matches **one** variable against **glob** patterns; first match wins. Use `|` for multiple patterns: `a|b) ...;;`.
+
+```bash title="case_demo.sh" linenums="1" hl_lines="13"
+# Case statement
 day="Monday"
 case "$day" in
     "Monday")
@@ -545,76 +593,88 @@ case "$day" in
     "Friday")
         echo "End of the week"
         ;;
-    *)
+    *) # (1)!
         echo "Midweek"
         ;;
 esac
 ```
 
-## Processing Options and Reading Files
+1.  :material-asterisk: **`* )`** is the **default** branch — runs when nothing else matched (like `default` in other languages).
 
-### While Loop
+## 📂 Processing options and reading files
 
-Syntax - `while <test_command>; do <consiquent_commands> done` | after `while` keyword we can use any command 
+### 🔁 While loop
 
-```bash
+Syntax: `while test; do commands; done` — any command can be the test ⏳.
+
+```bash title="while_countdown.sh" linenums="1"
 read -p "Enter a number: " num
-while [ $num -gt 10 ]; do
+while [ "$num" -gt 10 ]; do
     echo "The number is now: $num"
     num=$((num - 1))
 done
 ```
 
-!!! info "Remember"
-    `getopts` | Get the options provided to the script |  Syntax - `getopts "<option>:<option>:...:" variable_name` | `:` here says the `option` will receive some arguments for them | `getopts` do not get all the options at once, each time it runs - it takes the next option | Most of the time it runs under a while loop | Arguments provided will be stored under `$OPTARG` variable | Sequence of options doesn't matter
-    ```bash
+!!! info "⚙️ getopts"
+    Parse **options** like `-m 5`. Syntax: `getopts "ab:c:" opt` — a colon means the option takes an argument (**`$OPTARG`**). Call `getopts` repeatedly (often inside `while`) until it returns non-zero.
+
+    ```bash title="getopts_timer.sh" linenums="1" hl_lines="5 7"
     # getopts
     total_seconds=0
     while getopts "m:s:" opt; do
         case $opt in
-            m) echo "Minutes: $OPTARG"; total_seconds=$((total_seconds+(OPTARG * 60))) ;;
-            s) echo "Seconds: $OPTARG"; total_seconds=$((total_seconds+OPTARG)) ;;
-            *) echo "Invalid option: -$OPTARG" >&2 ;;
+            m) echo "Minutes: $OPTARG"; total_seconds=$((total_seconds + $OPTARG * 60)) ;; # (1)!
+            s) echo "Seconds: $OPTARG"; total_seconds=$((total_seconds + $OPTARG)) ;;
+            *) echo "Invalid option: -$OPTARG" >&2 ;; # (2)!
         esac
     done
     echo "Total seconds: $total_seconds"
-    while [ $total_seconds -gt 0 ]; do
+    while [ "$total_seconds" -gt 0 ]; do
         echo "Time remaining: $total_seconds seconds"
-        sleep 1s
+        sleep 1
         total_seconds=$((total_seconds - 1))
     done
     echo "Time's up!"
     ```
 
-> `read while` loop is a type of while loop that is used mostly for reading file line by line.It use `read` command for the test statement.
+    1.  :material-counter: **`$OPTARG`** holds the value after **`-m`** or **`-s`**; multiply minutes by **60** in `$((...))`.
+    2.  :material-alert-octagon-outline: **`* )`** catches **invalid flags**; redirect to **stderr** (`>&2`) so messages don’t pollute stdout pipes.
 
-```bash
+> **Read-while** — loop over lines: `while read -r line; do ...; done < file` (or from `"$1"`).
+
+```bash title="read_while_file.sh" linenums="1" hl_lines="5"
 # read while
-while read  line; do
+while read -r line; do
     echo "Read line: $line"
-done < "$1"
+done < "$1" # (1)!
 ```
 
-## Array and For Loop
+1.  :material-file-document-outline: **`< "$1"`** redirects **stdin** from the file path in the first argument — classic line-by-line ingest.
 
-Index start from `0`, Syntax - `var=(item1 item2 ...)`. If you do a parameter expansion on an array, you get get the first element only. `@` gives all the values at once. To add a number you use `var+=(value)`, it will be added to the last. To remove an ent fro the array we nee us the `unset`. But the index also gets deleted. You can check out the indexes by `!number[@]`. Replace a value with `var[Index]=value`
+## 🔁 Arrays and for loops
 
-```bash
+Indices start at **`0`**. Syntax: `arr=(e1 e2 ...)`. A bare `$arr` expands to the **first** element; use **`"${arr[@]}"`** for all elements. Append: **`arr+=(value)`**. Remove: **`unset 'arr[i]'`**. List indices: **`"${!arr[@]}"`**. Assign: **`arr[i]=value`**.
+
+```bash title="array_demo.sh" linenums="1" hl_lines="11"
 numbers=(1 2 3 4 5)
-echo $numbers
-echo "Third value:" ${numbers[2]}
-echo "All values:" ${numbers[@]}
-echo "Length of array:" ${#numbers[@]}
-echo "Last equal slice:" ${numbers[@]:2:3}
+echo "$numbers"
+echo "Third value:" "${numbers[2]}"
+echo "All values:" "${numbers[@]}"
+echo "Length of array:" "${#numbers[@]}"
+echo "Last equal slice:" "${numbers[@]:2:3}"
 
 numbers+=(100)
-unset numbers[1]
-echo "The Indexes of the array:" ${!numbers[@]}
+unset 'numbers[1]' # (1)!
+echo "The Indexes of the array:" "${!numbers[@]}"
 numbers[0]=10
-echo "Updated array:" ${numbers[@]}
+echo "Updated array:" "${numbers[@]}"
 ```
-Output
-```bash
+
+1.  :material-table-row-remove: **`unset 'arr[i]'`** removes one slot and leaves a **sparse** array — indices don’t auto-shift like some languages.
+
+#### Sample output
+
+```text title="Sample output — arrays"
 1
 Third value: 3
 All values: 1 2 3 4 5
@@ -624,104 +684,106 @@ The Indexes of the array: 0 2 3 4 5
 Updated array: 10 3 4 5 100
 ```
 
-Readarray is used to make array by reading content from source | Syntax - `readarray array_name < source` | You may have the `\n` after each item. For that you will need `-t` option | One item will he be created per line, even if the line have spaces in them.
+**readarray** (or **`mapfile`**) loads lines into an array: `readarray -t lines < source`. Use **`-t`** to strip trailing newline. One element per line (spaces on the line stay inside the element).
 
-```bash
+```bash title="readarray_demo.sh"
 # Readarray
 readarray -t lines < "$1"
-echo "Items in the array:" ${lines[@]}
+echo "Items in the array:" "${lines[@]}"
 ```
-You. can iterate over the `array` with `for` loop | Syntax - `for item_var in source; do <commands> done` 
 
-```bash
+You can iterate with **`for`**: `for item in list; do ...; done`.
+
+```bash title="for_days_from_file.sh"
 readarray -t days < "$1"
 for day in "${days[@]}"; do
     echo "Got the day: $day"
 done
 ```
 
-## Debugging
+## 🐞 Debugging
 
-`shellcheck` is used to check errors in the bash script | It also makes recommendations | Here is the [Link](https://www.shellcheck.net/) | We can also call it from command line, but you need to install it to your system | For mac `brew install shellcheck` | Use it with `shellcheck <bash_fine_name>`
+**shellcheck** — static analysis for shell scripts. [shellcheck.net](https://www.shellcheck.net/) — install e.g. `brew install shellcheck`, then **`shellcheck script.sh`**.
 
-Error Message Structure - `program_name: Narrow down the problem: Reason of the error` | `ls: cannot access: No file or directory`
-Common Errors
+Error messages often look like: **`program: context: reason`** (e.g. `ls: cannot access: No such file or directory`).
 
-- Syntax Error
+Common errors:
+
+- Syntax error
 - No such file or directory
 - File exists
-- Permission denied | You donn't have the access
-- Operation not permitted | You don't have permission for operation
+- Permission denied
+- Operation not permitted
 - Command not found
 
-Internal command are build in bash, external command are external | `type` is useful | `type -a cd` gives you the command type.
+**Builtin** vs **external** commands — **`type -a cmd`** shows what runs.
 
-`help` - If you are working with internal command | `help command` | `help command -d` gives short description | `-s` gives the usage information.
-`man` - If you are working with external command | short for manual | `man command` opens the manual page | exit qith `q` | `-k` can be used for search in all manual description | `-K` search in thee the manual pages
-`info` - If you are working with external command | `info command` open the info page | q
+- **`help`** — builtins: `help read`, `help -d read` (summary), `help -s read` (syntax)
+- **`man`** — external tools; **`q`** quits. **`-k keyword`** searches summaries; **`-K`** searches full pages
+- **`info`** — GNU docs for some programs
 
-## Scheduling and Automation
+## ⏰ Scheduling and automation
 
-`at` Command | Used for scheduling | Need to install it | enable it with this command in mac machine `sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.atrun.plist` | It's a demon service | Syntax-`at time` will open the prompt, go ahead and add command, finish it with `control` + `d` | `at -l` lists all the scheduled jobs | `at -r job_id` will remove the job | If you have a bash file you can add it with `at -f file_name time` syntax | Time must come before the Date | `9am 12/23/2026` | `9am tomorrow` | `9am nextweek` | `now + 2 days` | There is no way to run recurring job.
+**`at`** — run once at a given time (install/enable on macOS if needed: `sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.atrun.plist`). **Daemon** service. Run **`at 3:05am`**, type commands, finish with **Ctrl+D**. **`at -l`** lists jobs; **`at -r id`** removes one; **`at -f script.sh time`** runs a file. Examples: `9am 12/23/2026`, `9am tomorrow`, `now + 2 days`. Not for **recurring** tasks.
 
-```bash
+```bash title="at_session_example.sh"
 at 3:05am
-echo "Hello Word"
+echo "Hello World"
 at -l
-job 1 at Sat May  2 03:05:00 2026
+# job 1 at Sat May  2 03:05:00 2026
 at -f schedule_n_automation.sh 3:15am
 ```
 
-`cron`Command | `crontab` stores the information | `crontab -e` | It's just a text file and can be edited with nano or vim | You can change the editor with `EDITOR=nano crontab -e` command
-Every row is a seperate scheduled Job | Each row have 6 columns | 5 are scheduling information | 1 is the `command` we want to run.
+**`cron`** — **`crontab -e`** edits the table; set **`EDITOR=nano crontab -e`** if you like. Each non-comment line is one job: five time fields plus the command.
 
-- m | minute | `*` means every
-- h | hour 
-- dom | Day of the month
-- mon | Month
-- dow | Day of the week
-```bash
-* 13 * * * MON-SAT ~/bashScripts/cronScripts.sh # Every minute between 1pm-2pm Every single day of the month, Every month, Monday to Saturday
+- **m** — minute (`*` = every)
+- **h** — hour
+- **dom** — day of month
+- **mon** — month
+- **dow** — day of week
+
+```bash title="crontab_line_example.sh" linenums="1" hl_lines="1"
+* 13 * * * MON-SAT ~/bashScripts/cronScripts.sh # (1)! Every minute 1pm–2pm, every dom/mon, Mon–Sat
 ```
 
-A useful website to play with: [CrontabGuru](https://crontab.guru/)
+1.  :material-clock-outline: **Five time fields** + command — weekdays here use **`MON-SAT`**; tweak with [crontab.guru](https://crontab.guru/).
 
-Cron Directories | A folder on system, where we place the Scripts and run | In linux it's soted on `/ect`directory | We can create own crontab folder and directories
+Try [crontab.guru](https://crontab.guru/) to validate expressions.
 
-Let's say we have a directory called `~/Users/uner_name/cron.daily.8am` | Open regular user crontab for editing with `crontab -e` | `run-parts`takes a directory as an arguments and run all the scripts in that directory | `--report` will log each of the report it ran.
+**Cron drop-in directories** — on many Linux systems under **`/etc/cron.*`**. You can use **`run-parts`** to run every script in a directory:
 
-```bash
-# m h dom mon dow    Command
-00 08 * * * run-parts <path/to/scripts> --report
+```bash title="run_parts_daily.sh"
+# m h dom mon dow    command
+00 08 * * * run-parts /path/to/scripts --report
 ```
 
 ### Anacron
 
-> Detects the scheduled task missed because the machine was power off, and then re-run
+> Runs jobs that **missed** their schedule while the machine was off.
 
-## Working with Remote
+## 🌐 Working with remote machines
 
-SSH - `Secure Shell`
+**SSH** — secure shell.
 
-Command to comnnect: `ssh <user>@<ip_address>` | Disconnect with `exit`command
+Connect: **`ssh user@host`** — disconnect with **`exit`**.
 
-Send file to remote - `scp <source> <user>@<ip_address>:<target>`
-Receive file from remote - `scp <user>@<ip_address>:<source> <target>`
+- Copy **to** remote: **`scp source user@host:dest`**
+- Copy **from** remote: **`scp user@host:source dest`**
 
-## Cheat Sheet
+## 📋 Cheat sheet
 
-1. Check current shell: `echo $SHELL`
-2. Change to a new shell: `chsh -s /path/to/shell`
-3. `file <file_name>` gives the type of the file.
-4. `chmod +x <file_name>` to give execution permission. `777` All permission to all. `700` all for owner. `744`is the recommended.
-5. `./<file_name>` Runs a script with `file_name`
-6. `ls -l` give file list with permission metrix.
-7. `echo "$PATH"` - gives you the list of paths.
-8. `echo $OLDPWD` - gives the previous directory. Shortcut `~-`
-9. `echo $?` gives you the exit status
-10. Process substitution: Make the output of a process file like behavior. `<(command)`
-11. `cut` split string with a delimeter with `-d` | `$(string | cut -d "." -f 2)` | `-f` tells which part you want after cut.
-12. `curl` and `--head` can be used to hit a url
-13. `find` command is very useful for finding files, filtering and perform other operations.
+1. 🧭 Current shell: `echo $SHELL`
+2. 🔄 Change login shell: `chsh -s /path/to/shell`
+3. 📄 File type: `file filename`
+4. 🔓 Executable bit: `chmod +x file` — `777` all for all, `700` owner only, `744` is a common “shared read” pattern
+5. ▶️ Run a script: `./script.sh`
+6. 📑 Long listing: `ls -l` (permission matrix)
+7. 🛤️ Path list: `echo "$PATH"`
+8. ⏮️ Previous directory: `echo $OLDPWD` or `~-`
+9. ✅ Last exit status: `echo $?`
+10. 📎 Process substitution: `<(command)` treats command output like a file
+11. ✂️ **`cut`** — split on delimiter **`-d`**, field **`-f`**: e.g. `echo "$s" | cut -d "." -f 2`
+12. 🌐 **`curl --head`** — quick HTTP check
+13. 🔍 **`find`** — locate and filter files
 
-Repo Link [Here](https://github.com/hafiz-bs23/bash_bro)
+🔗 Repo: [bash_bro on GitHub](https://github.com/hafiz-bs23/bash_bro)
