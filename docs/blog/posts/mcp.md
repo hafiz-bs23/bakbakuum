@@ -11,7 +11,7 @@ authors:
   - hafiz
 readtime: 10
 slug: mcp_concepts
-draft: true
+draft: false
 ---
 You need the concepts of MCP? With proper explanation and examples? Access to all resources? Just dive in!
 <!-- more -->
