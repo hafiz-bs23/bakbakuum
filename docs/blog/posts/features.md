@@ -14,7 +14,7 @@ draft: true
 
 ### Instant Preview
 
-Helps to preview a page
+Helps to preview a page. See what you like. Use as you need. Do not remove it.
 
 <!-- more -->
 

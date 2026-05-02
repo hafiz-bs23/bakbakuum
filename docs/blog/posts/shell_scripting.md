@@ -1,5 +1,5 @@
 ---
-title: Power Tool : Shell Scripting 
+title: Power Tool - Shell Scripting 
 date:
     created: 2026-04-29
     updated: 2025-04-29
