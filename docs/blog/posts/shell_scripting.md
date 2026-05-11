@@ -785,5 +785,12 @@ Connect: **`ssh user@host`** — disconnect with **`exit`**.
 11. ✂️ **`cut`** — split on delimiter **`-d`**, field **`-f`**: e.g. `echo "$s" | cut -d "." -f 2`
 12. 🌐 **`curl --head`** — quick HTTP check
 13. 🔍 **`find`** — locate and filter files
+14. `set -e` - Tell the script to ext immediately if any command return non-zero status. Otherwise bash will just continue running the script. `-u` checks for undefined variables. `-o pipefail` sets says make sure all the commands need to successful to consider successful execution, otherwise the script is successful only if the last command is successful.
+15. You use `readonly` to make constant variables.
+16. `dirname` extracts the directory from a path. `dirname /home/user/script.sh` -> `/home/user`
+17. `BASH_SOURCE[0]` refers to the path of the script that currently running.
+18. `export` makes variables available to child processes ran from current process.
+19. `git show-ref --verify --quiet` verify if a branch is valid, `--quiet` only returns the exit code, no other output.
+20. `sed` - Stream Editor, used to edit text in a file. `sed 's/old/new/g' file.txt` replaces all occurrences of `old` with `new` in `file.txt`.
 
 🔗 Repo: [bash_bro on GitHub](https://github.com/hafiz-bs23/bash_bro)
