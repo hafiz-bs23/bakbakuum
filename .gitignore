@@ -1,0 +1,49 @@
+# ==========================================
+# 🛡️ THE VIRTUAL ENVIRONMENT KILL-SWITCH 🛡️
+# ==========================================
+# This ensures no environment files ever reach your repo.
+venv/
+.venv/
+env/
+.env/
+virtualenv/
+ENV/
+bin/
+lib/
+include/
+pyvenv.cfg
+conda/
+.conda/
+
+# ==========================================
+# 🐍 PYTHON COMPILATION & CACHE
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ==========================================
+# 🔐 SECRETS & CONFIGURATION
+# ==========================================
+.env
+.env.local
+.env.*
+*.secret
+*.key
+
+# ==========================================
+# 🧪 TESTING & COVERAGE
+# ==========================================
+.pytest_cache/
+.coverage
+htmlcov/
+nosetests.xml
+coverage.xml
+
+# ==========================================
+# 🖥️ IDE & OS TRASH
+# ==========================================
+.vscode/
+.idea/
+.DS_Store
+*.log

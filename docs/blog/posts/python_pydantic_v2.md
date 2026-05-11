@@ -124,6 +124,9 @@ class Circle(BaseModel):
 !!! danger
     When you are defining anything default, remember that default will be initialized only once and during the `compile` time. Each time it's called-will have the default value, something added to the default value will be there for all the instances. So, if you are using a mutable object as default value, it's a bad idea. But in pydantic is perfectly `**safe**` to do.
 
+!!! info
+    **Mutable** objects that can be changed after being created. `list`, `dict`, `set`, `bytearray` are mutable objects. **Immutable** objects that cannot be changed after being created. `int`, `float`, `complex`, `str`, `tuple`, `frozenset`, `bytes` are immutable objects. If you change an immutable object, python will create a new object in the memory.
+
 ### Nullable Fields
 
 ```python linenums="1" hl_lines="3"
@@ -191,6 +194,8 @@ class Model(BaseModel):
     model_config = ConfigDict(strict=True) # (1)!
     field: float
 ```
+
+1. We are setting the `strict` attribute to `True`.
 
 ### Validating Default Values
 Pydantic will not validate the default values in model defination. To enable it we have to use `validate_default` attribute.
@@ -281,7 +286,7 @@ There are other configurations:
 - `config`
 
 ## Field Aliases
-For naming convension, reserved keywords we need to use `aliases`. When we de-serialize, the name we feed is the `aliase` and that maps to a attribues in the model. One name in desearilizing is `aliese` other name in Pydantic model is `field name` another name when searilizing called `searilization aliese`. By deafult you can only deserialize only with `aliase` when defined, but we have option to consider both. 
+For naming convension, reserved keywords we need to use `aliases`. When we de-serialize, the name we feed is the `aliase` and that maps to a attribues in the model. One name in desearilizing is `aliese` other name in Pydantic model is `field name` another name when searilizing called `searilization aliese`. By deafult you can only deserialize with `aliase` when defined, but we have option to consider both. 
 
 `ID` | `Aliase` -> `Deserialization` -> `id_` | `Model Field` -> `Serialization` -> `id` | `Searilizing Alias`
 
@@ -289,12 +294,12 @@ Aanother aliases is called `Validation Aliase`. It overide plain aliases if it i
 
 - `alias` | serialization: `alias` & deserialization: `aliase`.
 - `validation_aliase` + `alias` | serialization: `aliase` & deserialization: `validation_aliase`.
--`alias` + `sealization_aliase` | serialization: `serealization_aliase` & deserialization: `aliase`.
+- `alias` + `sealization_aliase` | serialization: `serealization_aliase` & deserialization: `aliase`.
 - `validation_aliase` + `alias` + `serialization_aliase` | serialization: `serialization_aliase` & deserialization: `validation_aliase`.
 
 At model level we can define `automatic` aliase. with a function and attach with model configuration. We can also do custom serialization.
 
-### Using basic `aiase`
+### Using basic `aliase`
 You need to use the `Field` object and `aliase` attribute of the object to declare the aliase.
 
 ```python linenums="1" hl_lines="2-5 14-17 19"
@@ -505,6 +510,9 @@ class Model(BaseModel):
 10. `NewPath` ensures the path is new. The parent directory must exist.
 11. `StringConstraints` ensures the string is valid. we can use it to strip whitespace, convert to lower case, ensure min and max length, and ensure the string matches a regex pattern.
 
+!!! info
+    We can add some logical conditions like `ge`, `gt`, `le`, `lt`, `eq`, `ne`, `in`, `multiple_of` for validation. `default_factory` is used to set the default value for the field. The main difference is that the default value will be called each time a model object is created.
+
 
 Here is an example of a perfect object.
 
@@ -657,11 +665,257 @@ IPv Any Address: 192.168.0.1
 
 ## Additional fields configuration
 
-## Serialization and Deserialization
+A lot of time we may only need to add configurations to just the field/s. Let's see how we can add additional configurations to just the field/s.
+Check the example first.
+
+```python title="additional_fields_configuration.py" linenums="1"
+from pydantic import BaseModel, Field, ValidationError, ConfigDict
+
+class Model(BaseModel):
+    model_config = ConfigDict(strict=False, validate_default=True) # (1)!
+    field1: bool = Field(strict=True, default=False) # (2)!
+    field2: int = Field(frozen=True, default=1.0) # (3)!
+    field3: bool = Field(strict=True, validate_default=False, default=100.0) # (4)!
+    field4: str = Field(description="Hide me from serialization", exclude=True, default="I am secret") # (5)!
+model_obj_1 = Model(field1=True, field2=0) # (6)!
+print(model_obj_1) # (7)!
+try:
+    model_object_2 = Model(field1=1.0, field2=False) # (8)!
+except ValidationError as e:
+    print(e)
+
+try:
+    model_obj_1.field2 = True # (9)!
+except ValidationError as e:
+    print(e)
+```
+
+1. In model config level we are making the model files `lux` and making default value validation `True`.
+2. Will make this field strict only. So coercion will not work.
+3. It will be `lux`, `default` validation will work, but you won't be able to change the value of this field.
+4. Will make this field strict only and default value will no longer be validated. Will take `100.0` as the default value though it's a bool.
+5. Will exclude this field from serialization.
+6. Will successfully create the object. There will be no valifdation error.
+7. Will give the output `field1=True field2=0 field3=1.0`
+8. Will raise a validation error because `field1` is not a bool.
+9. Will raise a validation error because `field2` is frozen and you can't change the value of this field.
+
+!!! warning
+    `frozen` do not work as other does. You can't just make the model frozen in `ConfigDict` object and just make a field un-frozen. That will not work. But you can make a field frozen when the Model is not frozen.
 
 ## Annotated Type
 
+> A way to add metadata to an existing type. Python does nothing with it, but third-party libraries can use for their own use. Pydatic use it in high scale. We can annotate `Field`, `validators`, `serailizers`.
+
+```python title="annotated_type.py" linenums="1"
+from typing import Annotated
+from typing import get_args, TypeVar # (1)!
+from pydantic import BaseModel, Field, StringConstraints # (2)!
+
+SpecialType = Annotated[str, "Python does not care about it", [1,2,4], True] # (3)!
+print(get_args(SpecialType)) # (4)!
+
+BoundedInt = Annotated[int,Field(gt=0, le=100)] # Pydantic understands this and knows what to do with it. # (5)!
+BoundedStr = Annotated[str, Field(min_length=3, max_length=10, default="No Shape")] # (6)!
+BoundedListStr = Annotated[list[str], Field(min_length=1, max_length=5)] # (7)!
+StandardString = Annotated[
+    str,
+    StringConstraints(
+        to_lower=True,
+        min_length=3,
+        strip_whitespace=True,
+    )
+] # (8)!
+
+T = TypeVar('T') # (9)!
+DynamicBoundedType = Annotated[T, Field(gt=0, le=100)] # (10)!
+DynamicBoundedList = Annotated[list[T], Field(min_length=1, max_length=5)] # (11)!
+
+class Model(BaseModel):
+    x: BoundedInt # (12)!
+    y: DynamicBoundedType[int] # (13)!
+    z: DynamicBoundedType[float] # (14)!
+    shape_name: BoundedStr # (15)!
+    labels: BoundedListStr 
+    colors: DynamicBoundedList[str] # (16)!
+    code: StandardString # (17)!
+    
+print(Model.model_json_schema()) # (18)!
+```
+
+1. Import `Annotated` from `typing` to annotate the type. `TypeVar` is used to create a type variable. `get_args` is used to get the arguments of the type.
+2. Import `StringConstraints` from `pydantic` to add more validation rule to `str`
+3. Using `Annotated` we are annotating the type with metadata. Python does not care about it.
+4. That should give the output `(<class 'str'>, 'Python does not care about it', [1, 2, 4], True)`
+5. This will add field level validation type with `Annotated` type. It can be reusable.
+6. Another Annotated type with `Field` object for String type.
+7. Another Annotated type with `Field` object for List of String type.
+8. Another Annotated type with `StringConstraints`. It helps to add more validation to the `str` type like `to_lower`
+9. `TypeVar` represent any type of variable. It's a generic type.
+10. Using `TypeVar` here for dynamically bound variable type. Any type of variable will now be annotated. Now we can use it with any type of variable with any number of time.
+11. We can also use `TypeVar` with `list` type.
+12. Saying `x` is an `int` and value can be between 0-100 inclusive.
+13. Print the model json schema.
+
 ## Custom Validator
+
+!!! infor Pydantic Validation Steps
+    Data => Field Type Hint | Validation => Model instance field
+
+Some times we need more of of a custom validation. For that we can use `Custom Validator`.
+
+> **Custom Validator** is a function - `input` | (Raw value or already validated by Pydantic) Data being deserialized, `output` | Validation data. We can technically return a value that is completly different form the input value. We also can call it a transformation function. We can validate in both before/after (Before/After Validator) pydantic validation. We can have multiple custom validator and mixture of Before and After validator. It will work like pipeline of functions, output of one function will be input of the next function. Order depends on the order of the function in the class.
+
+```python
+# Defination Order
+before_validator_1()
+before_validator_2()
+pydantic_validation()
+after_validator_1()
+after_validator_2()
+
+# Execution Order
+before_validator_2()
+before_validator_1()
+pydantic_validation()
+after_validator_2()
+after_validator_1()
+
+# Defination Order
+before_validator_1()
+after_validator_1()
+before_validator_2()
+after_validator_2()
+
+# Execution Order
+before_validator_2()
+before_validator_1()
+pydantic_validation()
+after_validator_2()
+after_validator_1()
+```
+
+!!! info More features of Custom Validator
+    - Can be applied individual field, defined using `decorator`
+    - Can reference other fields in model.
+    - Same validator can be applied to multiple fields.
+    - Can be attached to a type using `Annotated` type.
+
+For custom validtion error, it raise `ValueError`, You can also raise `assertion` error but avoid it, assertion error can be surpressed. They will result in pydantiv `ValidationError` object. Other error will be show up as it is.
+
+
+!!! Info
+    There are also overall model validators, plain validators, wrap validators.
+
+The syntax is, inside class you need to define each validator as `@validator('field_name')` decorator, and then define the function. Function name doesn't matter. Remember, they are class method.
+
+Another approach to add custom Validation is with `Annotated` Type. You have to use `BeforeValidator` and `AfterValidator` from `pydantic` to add custom validation. Both `BeforeValidator` and `AfterValidator` takes validation function as argument.
+
+Other times you may need dependent field validation, that means one field may need to know another field/s before is valid first. Custom validator also receives an argument called **`ValidationInfo`**, which is a dictionary called `data` of all the *only validated* previous fields name and the value. You can access the value of the previous fields using `ValidationInfo.data['field_name']`.
+
+```python title="custom_validator.py" linenums="1"
+from pydantic import BaseModel, Field, field_validator, ValidationError, BeforeValidator, AfterValidator, ValidationInfo # (1)!
+from typing import Annotated
+
+
+def cool_before_validator(value): # (2)!
+    print(f"🚀 Running before validator for value: {value}")
+    if isinstance(value, str) and value.isdigit():
+        print(f"🔢 Converting string '{value}' to integer...")
+        return int(value)
+    else:
+        print(f"⚠️ Value '{value}' is not a digit string, skipping conversion and returning 0")
+        return 0
+    
+def say_validated(value): # (3)!
+    print(f"✅ Validated value: {value}")
+    return value
+
+BoundedInt = Annotated[int, Field(le=100), BeforeValidator(cool_before_validator), AfterValidator(say_validated)] # (4)!
+
+class Model(BaseModel):
+    x: int = Field(gt=0, le=100)
+    y: int = Field(gt=0, le=100)
+    z: BoundedInt
+    
+    @field_validator('x') # (5)!
+    @classmethod # (6)!
+    def validate_if_even(cls, value): # (7)!
+        print("🎯 Validating if x is even...")
+        if value % 2 != 0:
+            raise ValueError(f"🤦 x must be an even number, got {value}") # (8)!
+        return value
+    @field_validator('x')
+    @classmethod
+    def multiply_by_own(cls, value):
+        print(f"✖︎ Multiplying=> {value} by {value}...")
+        return value * value
+    
+    @field_validator('x', 'y') # (9)!
+    @classmethod
+    def multiply_with_pi(cls, value):
+        print(f"🥧 Multiplying {value} with pi...")
+        return value * 3.14159
+    
+    @field_validator('y') # (10)!
+    @classmethod
+    def validate_if_greater_then_x(cls, value, validated_values: ValidationInfo): # (11)!
+        values = validated_values.data # (12)!
+        if 'x' in values:
+            x_value = values['x']
+            print(f"🔍 Validating if y ({value}) is greater than x ({x_value})...")
+            if value <= x_value:
+                raise ValueError(f"🤦 y must be greater than x, got y={value} and x={x_value}")
+        return value
+    
+    @field_validator('x', 'y', mode='before') # (13)!
+    @classmethod
+    def not_fifty(cls, value):
+        print(f"🚫 Checking if {value} is 50 before validation...")
+        if value == 50:
+            raise ValueError("❌ Value cannot be 50")
+        print(f"✅ {value} is not 50, proceeding with validation...")
+        return value
+    
+model_object_1 = Model(x=4, y=40, z="16") # (14)!
+print(model_object_1) # (15)!
+try:
+    model_object_2 = Model(x="4", y=40, z="Oh my God!") # (16)!
+except ValidationError as e:
+    print("⚠️ Validation error occurred:")
+    print(e)
+    
+try:
+    model_object_3 = Model(x=5, y=5) # (17)!
+except ValidationError as e:
+    print("⚠️ Validation error occurred:")
+    print(e)
+
+```
+
+1. `field_validator` will help to add field level validation, `BeforeValidator` and `AfterValidator` are mostly used when used with Annotated type, `ValidationInfo` from `pydantic` provide information about validated fields of the model.
+2. Defining a validation method. Any valid method description will be used here.
+3. Another validation method. For Annotated type we can use these.
+4. The `BoundedInt` is annotated with field type with `int` and validation with `Field` object. It will also have before and after validator with `BeforeValidator` and `AfterValidator` objects. `BeforeValidator` and `Aftervalidator` will take validation method as argument.
+5. For field level validation we need to use `field_validator` decorator. It will take the field name as argument. For more then one field We can add them by seperating them with comma also use `*` to apply validator to all fields. You just need to add a `mode` to specify before and after. By default it's after.
+6. Since validators are class method, we need to use `@classmethod` decorator. It's 100% python requirement.
+7. A before validator, since it's a class method, we are passing `cls` as the first argument. and the value of the field will be passed as the second argument.
+8. We are raising `ValueError` here. It will be considered by Pydantic and ultimately raise a validation error. Othertype of error will be shown up as it is.
+9. Here same after validation rule will be applied for both `x` and `y` fields.
+10. Field validation for only `y` field. 
+11. `ValidationInfo` here represent validated values offered by pydantic.
+12. `data` property holds the validated values of the previous fields.
+13. `mode` represent if we want to apply the validator before or after the pydantic validation.
+14. `z` will be converted to int by the before validator, and x will be validated and transformed by the field validators.
+15. The output will be 🚫 Checking if 4 is 50 before validation...✅ 4 is not 50, proceeding with validation...🎯 Validating if x is even...✖︎ Multiplying=> 4 by 4...🥧 Multiplying 16 with pi...🚫 Checking if 40 is 50 before validation...✅ 40 is not 50, proceeding with validation...🥧 Multiplying 40 with pi...🔍 Validating if y (125.6636) is greater than x (50.26544)...🚀 Running before validator for value: 16 🔢 Converting string '16' to integer...✅ Validated value: 16 x=50.26544 y=125.6636 z=16
+16. `z` will not be converted here, We will not get any error here, but we will the get the value of `z` = 0. And also the message - ⚠️ Value 'Oh my God!' is not a digit string, skipping conversion and returning 0 ✅ Validated value: 0
+17. We will recieve two error here, Value error, 🤦 x must be an even number, got 5 | z Field required
+
+!!! info
+    `*` can be used to apply validator to all fields. You just need to add a `mode` to specify before and after. By default it's after.
+
+## Serialization and Deserialization
+
 
 ## Computed Fields
 
@@ -681,4 +935,5 @@ IPv Any Address: 192.168.0.1
 - `.model_config` gives the configuration of the model.
 - `FieldSerializationInfo` from `pydantic` offers different information of the serialization.
 
- 
+## Repo
+Checkout the code examples [here](https://github.com/hafiz-bs23/pydantic_v2).
